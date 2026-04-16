@@ -36,25 +36,28 @@ function parseMeta() {
 }
 
 function parseProduct() {
-    const id = getDatasetAttr("section.product", "id");
-    const name = getTextContent(".about h1");
-    const isLiked = "active" in document.querySelector("figure button").classList;
-    const tags = {};
-    const price = document.querySelector(".about .price").innerHTML;
-    console.log(price);
-    const oldPrice = 0;
-    const discount = oldPrice - price;
-    const discountPercent = "";
-    const currency = "";
-    const properties = {};
-    const description = "";
-    const image = []
+  const id = getDatasetAttr("section.product", "id");
+  const name = getTextContent(".about h1");
+  const isLiked = "active" in document.querySelector("figure button").classList;
+  const tags = {};
+  const prices = getTextContent(".about .price").trim().split("\n").map(element => {
+    return element.trim();
+  });
+  // const price = Number.parseInt(prices[0]);
+  console.log(prices);
+  const oldPrice = 0;
+  const discount = oldPrice;
+  const discountPercent = "";
+  const currency = "";
+  const properties = {};
+  const description = "";
+  const image = []
   return {
     id,
     name,
     isLiked,
     tags,
-    price,
+    // price,
     oldPrice,
     discount,
     discountPercent,
@@ -65,16 +68,16 @@ function parseProduct() {
   }
 };
 
-function parseSuggested() {return []};
+function parseSuggested() { return [] };
 
-function parseReviews() {return []};
+function parseReviews() { return [] };
 
 function parsePage() {
   return {
     meta: { ...parseMeta() },
     product: { ...parseProduct() },
-    suggested: [ ...parseSuggested() ],
-    reviews: [ ...parseReviews() ],
+    suggested: [...parseSuggested()],
+    reviews: [...parseReviews()],
   };
 }
 
