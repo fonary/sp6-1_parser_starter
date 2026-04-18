@@ -36,28 +36,32 @@ function parseMeta() {
 }
 
 function parseProduct() {
+  const currencies = [String.fromCodePoint(0x20BD),"RUB"]
+  console.log(currencies); 
   const id = getDatasetAttr("section.product", "id");
   const name = getTextContent(".about h1");
   const isLiked = "active" in document.querySelector("figure button").classList;
   const tags = {};
-  const prices = getTextContent(".about .price").trim().split("\n").map(element => {
-    return element.trim();
-  });
-  // const price = Number.parseInt(prices[0]);
-  console.log(prices);
-  const oldPrice = 0;
-  const discount = oldPrice;
-  const discountPercent = "";
+  const [price, oldPrice] = getTextContent(".about .price")
+    .trim()
+    .split("\n")
+    .map((element) => {
+      return +element.trim().split("").splice(1).join("");
+    });
+
+  const discount = oldPrice - price;
+  const discountPercent = `${discount ? (discount / oldPrice) * 100 : 0}%`;
+  console.log(String.fromCodePoint(0x20BD));
   const currency = "";
   const properties = {};
   const description = "";
-  const image = []
+  const image = [];
   return {
     id,
     name,
     isLiked,
     tags,
-    // price,
+    price,
     oldPrice,
     discount,
     discountPercent,
@@ -65,12 +69,16 @@ function parseProduct() {
     properties,
     description,
     image,
-  }
-};
+  };
+}
 
-function parseSuggested() { return [] };
+function parseSuggested() {
+  return [];
+}
 
-function parseReviews() { return [] };
+function parseReviews() {
+  return [];
+}
 
 function parsePage() {
   return {
