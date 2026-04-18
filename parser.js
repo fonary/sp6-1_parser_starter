@@ -36,23 +36,25 @@ function parseMeta() {
 }
 
 function parseProduct() {
-  const currencies = [String.fromCodePoint(0x20BD),"RUB"]
-  console.log(currencies); 
+  const currencies = Object.fromEntries([
+    [String.fromCodePoint(0x20BD),"RUB"],
+    [String.fromCodePoint(0x20AC), "EUR"],
+    [String.fromCodePoint(0x0024), "USD"]
+  ]);
   const id = getDatasetAttr("section.product", "id");
   const name = getTextContent(".about h1");
   const isLiked = "active" in document.querySelector("figure button").classList;
   const tags = {};
-  const [price, oldPrice] = getTextContent(".about .price")
+  const prices = getTextContent(".about .price")
     .trim()
     .split("\n")
+  const [price, oldPrice] = prices
     .map((element) => {
       return +element.trim().split("").splice(1).join("");
     });
-
   const discount = oldPrice - price;
   const discountPercent = `${discount ? (discount / oldPrice) * 100 : 0}%`;
-  console.log(String.fromCodePoint(0x20BD));
-  const currency = "";
+  const currency = currencies[prices[0][0]];
   const properties = {};
   const description = "";
   const image = [];
