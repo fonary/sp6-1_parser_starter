@@ -3,7 +3,10 @@ function getAttributeValue(selector, attribute) {
   return document.querySelector(selector).getAttribute(attribute);
 }
 
-function getTextContent(selector) {
+function getText(selector, inner = false) {
+  if (inner) {
+    return document.querySelector(selector).innerHTML;
+  }
   return document.querySelector(selector).textContent;
 }
 
@@ -15,7 +18,7 @@ function parseMeta() {
   const ogContent = (og) =>
     getAttributeValue(`meta[property='og:${og}']`, "content");
   const language = getAttributeValue("html", "lang");
-  const title = getTextContent("title").split(" — ")[0].trim();
+  const title = getText("title").split(" — ")[0].trim();
   const keywords = getAttributeValue("meta[name='keywords']", "content").split(
     ", ",
   );
@@ -42,10 +45,10 @@ function parseProduct() {
     [String.fromCodePoint(0x0024), "USD"]
   ]);
   const id = getDatasetAttr("section.product", "id");
-  const name = getTextContent(".about h1");
+  const name = getText(".about h1");
   const isLiked = "active" in document.querySelector("figure button").classList;
   const tags = {};
-  const prices = getTextContent(".about .price")
+  const prices = getText(".about .price")
     .trim()
     .split("\n")
   const [price, oldPrice] = prices
@@ -56,7 +59,7 @@ function parseProduct() {
   const discountPercent = `${discount ? (discount / oldPrice) * 100 : 0}%`;
   const currency = currencies[prices[0][0]];
   const properties = {};
-  const description = "";
+  const description = getText("div.description", true);
   const image = [];
   return {
     id,
