@@ -28,13 +28,13 @@ function parseMeta() {
   const ogContent = (og) =>
     getAttributeValue(`meta[property='og:${og}']`, "content");
   const language = getAttributeValue("html", "lang");
-  const title = getText("title").split(" — ")[0].trim();
+  const title = getText("title").split("—")[0].trim();
   const keywords = getAttributeValue("meta[name='keywords']", "content").split(
     ", ",
   );
   const description = getAttributeValue("meta[name='description']", "content");
   const opengraph = {
-    title: ogContent("title"),
+    title: ogContent("title").split("—")[0].trim(),
     image: ogContent("image"),
     type: ogContent("type"),
   };
@@ -80,7 +80,7 @@ function parseProduct() {
   });
 
   const discount = oldPrice - price;
-  const discountPercent = `${discount ? (discount / oldPrice) * 100 : 0}%`;
+  const discountPercent = `${discount ? ((discount / oldPrice) * 100).toFixed(2) : 0}%`;
   const currency = currencies[prices[0][0]];
   const properties = (() => {
     const properties = {};
@@ -97,7 +97,7 @@ function parseProduct() {
     }
   })();
 
-  const description = getText("div.description", true).trim();
+  const description = getText("div.description", true).trim().replace('<h3 class="unused">', "<h3>");
   const images = (() => {
     const images = [];
     images.push({});
