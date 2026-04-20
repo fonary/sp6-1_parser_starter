@@ -40,27 +40,44 @@ function parseMeta() {
 
 function parseProduct() {
   const currencies = Object.fromEntries([
-    [String.fromCodePoint(0x20BD),"RUB"],
-    [String.fromCodePoint(0x20AC), "EUR"],
-    [String.fromCodePoint(0x0024), "USD"]
+    [String.fromCodePoint(0x20bd), "RUB"],
+    [String.fromCodePoint(0x20ac), "EUR"],
+    [String.fromCodePoint(0x0024), "USD"],
   ]);
   const id = getDatasetAttr("section.product", "id");
   const name = getText(".about h1");
   const isLiked = "active" in document.querySelector("figure button").classList;
-  const tags = {};
-  const prices = getText(".about .price")
-    .trim()
-    .split("\n")
-  const [price, oldPrice] = prices
-    .map((element) => {
-      return +element.trim().split("").splice(1).join("");
-    });
+  const tags = (() => {
+    const tags = {};
+    const tagTypes = {
+      red: "discount",
+      blue: "label",
+      green: "category",
+    };
+    const tagCollection = document.querySelector("div.tags").children;
+    if (!tagCollection.length) {
+      return tags;
+    } else {
+      for (const element of tagCollection) {
+        const key = tagTypes[element.className];
+        if (!(key in tags)) {
+          tags[key] = [];
+        }
+        tags[key].push(element.textContent.trim());
+      }
+      return tags;
+    }
+  })();
+  const prices = getText(".about .price").trim().split("\n");
+  const [price, oldPrice] = prices.map((element) => {
+    return +element.trim().split("").splice(1).join("");
+  });
   const discount = oldPrice - price;
   const discountPercent = `${discount ? (discount / oldPrice) * 100 : 0}%`;
   const currency = currencies[prices[0][0]];
-  const properties = {};
-  const description = getText("div.description", true);
-  const image = [];
+  const properties = {}; //  TODO parse properties
+  const description = getText("div.description", true).trim();
+  const image = []; // TODO parse image
   return {
     id,
     name,
