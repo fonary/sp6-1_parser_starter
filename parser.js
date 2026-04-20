@@ -3,6 +3,10 @@ function getAttributeValue(selector, attribute) {
   return document.querySelector(selector).getAttribute(attribute);
 }
 
+function getChildren(selector) {
+  return document.querySelector(selector).children;
+}
+
 function getText(selector, inner = false) {
   if (inner) {
     return document.querySelector(selector).innerHTML;
@@ -54,7 +58,7 @@ function parseProduct() {
       blue: "label",
       green: "category",
     };
-    const tagCollection = document.querySelector("div.tags").children;
+    const tagCollection = getChildren("div.tags");
     if (!tagCollection.length) {
       return tags;
     } else {
@@ -68,16 +72,51 @@ function parseProduct() {
       return tags;
     }
   })();
+
   const prices = getText(".about .price").trim().split("\n");
   const [price, oldPrice] = prices.map((element) => {
     return +element.trim().split("").splice(1).join("");
   });
+
   const discount = oldPrice - price;
   const discountPercent = `${discount ? (discount / oldPrice) * 100 : 0}%`;
   const currency = currencies[prices[0][0]];
-  const properties = {}; //  TODO parse properties
+  const properties = (() => {
+    const properties = {};
+    const propertyCollection = getChildren("ul.properties");
+    if (!propertyCollection.length) {
+      return properties;
+    } else {
+      for (const element of propertyCollection) {
+        const liElement = element.children;
+        properties[liElement[0].textContent.trim()] =
+          liElement[1].textContent.trim();
+      }
+      return properties;
+    }
+  })();
+
   const description = getText("div.description", true).trim();
-  const image = []; // TODO parse image
+  const images = (() => {
+    const images = [];
+    images.push({});
+    const imageCollection = getChildren("div.preview nav");
+    for (const element of imageCollection) {
+      const isDefaultImage = !(element.getAttribute("disabled") === null);
+      const image = {
+        preview: element.children[0].getAttribute("src"),
+        full: element.children[0].dataset.src,
+        alt: element.children[0].getAttribute("alt"),
+      };
+      if (isDefaultImage) {
+        images[0] = image;
+        continue;
+      }
+      images.push(image);
+    }
+    return images;
+  })(); // TODO parse image
+
   return {
     id,
     name,
@@ -90,7 +129,7 @@ function parseProduct() {
     currency,
     properties,
     description,
-    image,
+    images,
   };
 }
 
