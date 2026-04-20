@@ -116,7 +116,7 @@ function parseProduct() {
       images.push(image);
     }
     return images;
-  })(); // TODO parse image
+  })();
 
   return {
     id,
@@ -155,7 +155,40 @@ function parseSuggested() {
 }
 
 function parseReviews() {
-  return [];
+  const reviews = [];
+  const reviewsCollection = getChildren(".reviews .container .items");
+  for (const element of reviewsCollection) {
+    const rating = (() => {
+      let count = 0;
+      for (const rate of element.children[0].children) {
+        if (rate.className === "filled") {
+          count++;
+        }
+      }
+      return count;
+    })();
+    const title = element.children[1].children[0].textContent.trim();
+    const description = element.children[1].children[1].textContent.trim();
+    const date = element.children[2].children[2].textContent
+      .trim()
+      .split("/")
+      .join(".");
+    const author = {
+      avatar: element.children[2].children[0].getAttribute("src"),
+      name: element.children[2].children[1].textContent.trim(),
+    };
+    const item = {
+      rating,
+      author,
+      title,
+      description,
+      date,
+    };
+
+    reviews.push(item);
+  }
+
+  return reviews;
 }
 
 function parsePage() {
