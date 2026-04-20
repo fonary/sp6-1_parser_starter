@@ -1,4 +1,10 @@
 // @todo: напишите здесь код парсера
+const currencies = Object.fromEntries([
+  [String.fromCodePoint(0x20bd), "RUB"],
+  [String.fromCodePoint(0x20ac), "EUR"],
+  [String.fromCodePoint(0x0024), "USD"],
+]);
+
 function getAttributeValue(selector, attribute) {
   return document.querySelector(selector).getAttribute(attribute);
 }
@@ -43,11 +49,6 @@ function parseMeta() {
 }
 
 function parseProduct() {
-  const currencies = Object.fromEntries([
-    [String.fromCodePoint(0x20bd), "RUB"],
-    [String.fromCodePoint(0x20ac), "EUR"],
-    [String.fromCodePoint(0x0024), "USD"],
-  ]);
   const id = getDatasetAttr("section.product", "id");
   const name = getText(".about h1");
   const isLiked = "active" in document.querySelector("figure button").classList;
@@ -134,7 +135,23 @@ function parseProduct() {
 }
 
 function parseSuggested() {
-  return [];
+  const suggested = [];
+  const suggestedCollection = getChildren(".suggested .container .items");
+  for (const element of suggestedCollection) {
+    const item = {
+      image: element.children[0].getAttribute("src"),
+      name: element.children[1].textContent.trim(),
+      description: element.children[3].textContent.trim(),
+      price: element.children[2].textContent
+        .trim()
+        .split("")
+        .splice(1)
+        .join(""),
+      currency: currencies[element.children[2].textContent[0]],
+    };
+    suggested.push(item);
+  }
+  return suggested;
 }
 
 function parseReviews() {
@@ -143,10 +160,10 @@ function parseReviews() {
 
 function parsePage() {
   return {
-    meta: { ...parseMeta() },
-    product: { ...parseProduct() },
-    suggested: [...parseSuggested()],
-    reviews: [...parseReviews()],
+    meta: parseMeta(),
+    product: parseProduct(),
+    suggested: parseSuggested(),
+    reviews: parseReviews(),
   };
 }
 
